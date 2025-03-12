@@ -5,7 +5,8 @@ import MainLayout from "@/components/layout/MainLayout";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/toaster";
+import { useToast } from "@/hooks/use-toast";
+import { Input } from "@/components/ui/input";
 import { Eye, EyeOff, Mail, Lock, User, LogIn } from "lucide-react";
 
 const LoginPage = () => {
@@ -56,124 +57,123 @@ const LoginPage = () => {
 
           <Card className="border-gray-200 shadow-md">
             <CardHeader className="pb-2">
-              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="w-full">
                 <TabsList className="w-full">
                   <TabsTrigger value="email" className="flex-1">邮箱登录</TabsTrigger>
                   <TabsTrigger value="phone" className="flex-1">手机登录</TabsTrigger>
                 </TabsList>
-              </Tabs>
-            </CardHeader>
-            <CardContent className="p-6">
-              <TabsContent value="email">
-                <form onSubmit={handleLogin}>
-                  <div className="space-y-4">
-                    <div>
-                      <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                        电子邮箱
-                      </label>
-                      <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-                        <input 
-                          type="email" 
-                          id="email"
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                          className="w-full p-2 pl-10 border rounded-md" 
-                          placeholder="请输入电子邮箱"
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                        密码
-                      </label>
-                      <div className="relative">
-                        <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-                        <input 
-                          type={showPassword ? "text" : "password"} 
-                          id="password"
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                          className="w-full p-2 pl-10 border rounded-md" 
-                          placeholder="请输入密码"
-                        />
-                        <button 
-                          type="button"
-                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                          onClick={() => setShowPassword(!showPassword)}
-                        >
-                          {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                        </button>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center">
-                        <input 
-                          type="checkbox" 
-                          id="rememberMe"
-                          checked={rememberMe}
-                          onChange={(e) => setRememberMe(e.target.checked)}
-                          className="mr-2" 
-                        />
-                        <label htmlFor="rememberMe" className="text-sm text-gray-600">
-                          记住我
-                        </label>
-                      </div>
-                      <a href="#" className="text-sm text-novel-red hover:underline">
-                        忘记密码？
-                      </a>
-                    </div>
-                  </div>
-                  <Button 
-                    type="submit" 
-                    className="w-full mt-6 bg-novel-red hover:bg-novel-red/90"
-                  >
-                    <LogIn size={18} className="mr-2" />
-                    登录
-                  </Button>
-                </form>
-              </TabsContent>
               
-              <TabsContent value="phone">
-                <form onSubmit={handlePhoneLogin}>
-                  <div className="space-y-4">
-                    <div>
-                      <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
-                        手机号码
-                      </label>
-                      <input 
-                        type="tel" 
-                        id="phone" 
-                        className="w-full p-2 border rounded-md" 
-                        placeholder="请输入手机号码"
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="verificationCode" className="block text-sm font-medium text-gray-700 mb-1">
-                        验证码
-                      </label>
-                      <div className="flex gap-2">
-                        <input 
-                          type="text" 
-                          id="verificationCode" 
-                          className="w-full p-2 border rounded-md" 
-                          placeholder="请输入验证码"
-                        />
-                        <Button variant="outline" type="button">
-                          获取验证码
-                        </Button>
+                <TabsContent value="email">
+                  <form onSubmit={handleLogin}>
+                    <div className="space-y-4">
+                      <div>
+                        <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                          电子邮箱
+                        </label>
+                        <div className="relative">
+                          <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                          <Input 
+                            type="email" 
+                            id="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            className="w-full pl-10" 
+                            placeholder="请输入电子邮箱"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                          密码
+                        </label>
+                        <div className="relative">
+                          <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                          <Input 
+                            type={showPassword ? "text" : "password"} 
+                            id="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            className="w-full pl-10" 
+                            placeholder="请输入密码"
+                          />
+                          <button 
+                            type="button"
+                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                            onClick={() => setShowPassword(!showPassword)}
+                          >
+                            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                          </button>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center">
+                          <input 
+                            type="checkbox" 
+                            id="rememberMe"
+                            checked={rememberMe}
+                            onChange={(e) => setRememberMe(e.target.checked)}
+                            className="mr-2" 
+                          />
+                          <label htmlFor="rememberMe" className="text-sm text-gray-600">
+                            记住我
+                          </label>
+                        </div>
+                        <a href="#" className="text-sm text-novel-red hover:underline">
+                          忘记密码？
+                        </a>
                       </div>
                     </div>
-                  </div>
-                  <Button 
-                    type="submit" 
-                    className="w-full mt-6 bg-novel-red hover:bg-novel-red/90"
-                  >
-                    <LogIn size={18} className="mr-2" />
-                    登录
-                  </Button>
-                </form>
-              </TabsContent>
+                    <Button 
+                      type="submit" 
+                      className="w-full mt-6 bg-novel-red hover:bg-novel-red/90"
+                    >
+                      <LogIn size={18} className="mr-2" />
+                      登录
+                    </Button>
+                  </form>
+                </TabsContent>
+                
+                <TabsContent value="phone">
+                  <form onSubmit={handlePhoneLogin}>
+                    <div className="space-y-4">
+                      <div>
+                        <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
+                          手机号码
+                        </label>
+                        <Input 
+                          type="tel" 
+                          id="phone" 
+                          className="w-full" 
+                          placeholder="请输入手机号码"
+                        />
+                      </div>
+                      <div>
+                        <label htmlFor="verificationCode" className="block text-sm font-medium text-gray-700 mb-1">
+                          验证码
+                        </label>
+                        <div className="flex gap-2">
+                          <Input 
+                            type="text" 
+                            id="verificationCode" 
+                            className="w-full" 
+                            placeholder="请输入验证码"
+                          />
+                          <Button variant="outline" type="button">
+                            获取验证码
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                    <Button 
+                      type="submit" 
+                      className="w-full mt-6 bg-novel-red hover:bg-novel-red/90"
+                    >
+                      <LogIn size={18} className="mr-2" />
+                      登录
+                    </Button>
+                  </form>
+                </TabsContent>
+              </Tabs>
               
               <div className="mt-6 text-center">
                 <p className="text-sm text-gray-600">
@@ -220,7 +220,7 @@ const LoginPage = () => {
                   </svg>
                 </button>
               </div>
-            </CardContent>
+            </CardHeader>
           </Card>
 
           <div className="mt-6 text-center">

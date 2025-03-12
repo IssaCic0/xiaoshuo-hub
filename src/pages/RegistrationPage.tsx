@@ -5,7 +5,8 @@ import MainLayout from "@/components/layout/MainLayout";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/toaster";
+import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
 import { Eye, EyeOff, UserPlus, Mail, Lock, User } from "lucide-react";
 
 const RegistrationPage = () => {
@@ -89,181 +90,180 @@ const RegistrationPage = () => {
 
           <Card className="border-gray-200 shadow-md">
             <CardHeader className="pb-2">
-              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="w-full">
                 <TabsList className="w-full">
                   <TabsTrigger value="email" className="flex-1">邮箱注册</TabsTrigger>
                   <TabsTrigger value="phone" className="flex-1">手机注册</TabsTrigger>
                 </TabsList>
-              </Tabs>
-            </CardHeader>
-            <CardContent className="p-6">
-              <TabsContent value="email">
-                <form onSubmit={handleSubmit}>
-                  <div className="space-y-4">
-                    <div>
-                      <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
-                        用户名
-                      </label>
-                      <div className="relative">
-                        <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+              
+                <TabsContent value="email">
+                  <form onSubmit={handleSubmit}>
+                    <div className="space-y-4">
+                      <div>
+                        <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
+                          用户名
+                        </label>
+                        <div className="relative">
+                          <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                          <Input 
+                            type="text" 
+                            id="username"
+                            name="username"
+                            value={formData.username}
+                            onChange={handleChange}
+                            className="w-full pl-10" 
+                            placeholder="请输入用户名"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                          电子邮箱
+                        </label>
+                        <div className="relative">
+                          <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                          <Input 
+                            type="email" 
+                            id="email"
+                            name="email"
+                            value={formData.email}
+                            onChange={handleChange}
+                            className="w-full pl-10" 
+                            placeholder="请输入电子邮箱"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                          密码
+                        </label>
+                        <div className="relative">
+                          <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                          <Input 
+                            type={showPassword ? "text" : "password"} 
+                            id="password"
+                            name="password"
+                            value={formData.password}
+                            onChange={handleChange}
+                            className="w-full pl-10" 
+                            placeholder="请设置密码"
+                          />
+                          <button 
+                            type="button"
+                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                            onClick={() => setShowPassword(!showPassword)}
+                          >
+                            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                          </button>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-1">密码长度至少8位，包含字母和数字</p>
+                      </div>
+                      <div>
+                        <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+                          确认密码
+                        </label>
+                        <div className="relative">
+                          <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                          <Input 
+                            type={showConfirmPassword ? "text" : "password"} 
+                            id="confirmPassword"
+                            name="confirmPassword"
+                            value={formData.confirmPassword}
+                            onChange={handleChange}
+                            className="w-full pl-10" 
+                            placeholder="请再次输入密码"
+                          />
+                          <button 
+                            type="button"
+                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                          >
+                            {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                          </button>
+                        </div>
+                      </div>
+                      <div className="flex items-start">
                         <input 
-                          type="text" 
-                          id="username"
-                          name="username"
-                          value={formData.username}
+                          type="checkbox" 
+                          id="agreeTerms"
+                          name="agreeTerms"
+                          checked={formData.agreeTerms}
                           onChange={handleChange}
-                          className="w-full p-2 pl-10 border rounded-md" 
-                          placeholder="请输入用户名"
+                          className="mt-1 mr-2" 
                         />
+                        <label htmlFor="agreeTerms" className="text-sm text-gray-600">
+                          我已阅读并同意<a href="#" className="text-novel-red hover:underline">用户协议</a>和<a href="#" className="text-novel-red hover:underline">隐私政策</a>
+                        </label>
                       </div>
                     </div>
-                    <div>
-                      <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                        电子邮箱
-                      </label>
-                      <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-                        <input 
-                          type="email" 
-                          id="email"
-                          name="email"
-                          value={formData.email}
-                          onChange={handleChange}
-                          className="w-full p-2 pl-10 border rounded-md" 
-                          placeholder="请输入电子邮箱"
+                    <Button 
+                      type="submit" 
+                      className="w-full mt-6 bg-novel-red hover:bg-novel-red/90"
+                    >
+                      <UserPlus size={18} className="mr-2" />
+                      注册账号
+                    </Button>
+                  </form>
+                </TabsContent>
+                
+                <TabsContent value="phone">
+                  <form onSubmit={handlePhoneRegistration}>
+                    <div className="space-y-4">
+                      <div>
+                        <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
+                          手机号码
+                        </label>
+                        <Input 
+                          type="tel" 
+                          id="phone" 
+                          className="w-full" 
+                          placeholder="请输入手机号码"
                         />
                       </div>
-                    </div>
-                    <div>
-                      <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                        密码
-                      </label>
-                      <div className="relative">
-                        <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-                        <input 
-                          type={showPassword ? "text" : "password"} 
-                          id="password"
-                          name="password"
-                          value={formData.password}
-                          onChange={handleChange}
-                          className="w-full p-2 pl-10 border rounded-md" 
+                      <div>
+                        <label htmlFor="verificationCode" className="block text-sm font-medium text-gray-700 mb-1">
+                          验证码
+                        </label>
+                        <div className="flex gap-2">
+                          <Input 
+                            type="text" 
+                            id="verificationCode" 
+                            className="w-full" 
+                            placeholder="请输入验证码"
+                          />
+                          <Button variant="outline" type="button">
+                            获取验证码
+                          </Button>
+                        </div>
+                      </div>
+                      <div>
+                        <label htmlFor="phonePassword" className="block text-sm font-medium text-gray-700 mb-1">
+                          设置密码
+                        </label>
+                        <Input 
+                          type="password" 
+                          id="phonePassword" 
+                          className="w-full" 
                           placeholder="请设置密码"
                         />
-                        <button 
-                          type="button"
-                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                          onClick={() => setShowPassword(!showPassword)}
-                        >
-                          {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                        </button>
                       </div>
-                      <p className="text-xs text-gray-500 mt-1">密码长度至少8位，包含字母和数字</p>
-                    </div>
-                    <div>
-                      <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
-                        确认密码
-                      </label>
-                      <div className="relative">
-                        <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-                        <input 
-                          type={showConfirmPassword ? "text" : "password"} 
-                          id="confirmPassword"
-                          name="confirmPassword"
-                          value={formData.confirmPassword}
-                          onChange={handleChange}
-                          className="w-full p-2 pl-10 border rounded-md" 
-                          placeholder="请再次输入密码"
-                        />
-                        <button 
-                          type="button"
-                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        >
-                          {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                        </button>
+                      <div className="flex items-start">
+                        <input type="checkbox" id="phoneAgreeTerms" className="mt-1 mr-2" />
+                        <label htmlFor="phoneAgreeTerms" className="text-sm text-gray-600">
+                          我已阅读并同意<a href="#" className="text-novel-red hover:underline">用户协议</a>和<a href="#" className="text-novel-red hover:underline">隐私政策</a>
+                        </label>
                       </div>
                     </div>
-                    <div className="flex items-start">
-                      <input 
-                        type="checkbox" 
-                        id="agreeTerms"
-                        name="agreeTerms"
-                        checked={formData.agreeTerms}
-                        onChange={handleChange}
-                        className="mt-1 mr-2" 
-                      />
-                      <label htmlFor="agreeTerms" className="text-sm text-gray-600">
-                        我已阅读并同意<a href="#" className="text-novel-red hover:underline">用户协议</a>和<a href="#" className="text-novel-red hover:underline">隐私政策</a>
-                      </label>
-                    </div>
-                  </div>
-                  <Button 
-                    type="submit" 
-                    className="w-full mt-6 bg-novel-red hover:bg-novel-red/90"
-                  >
-                    <UserPlus size={18} className="mr-2" />
-                    注册账号
-                  </Button>
-                </form>
-              </TabsContent>
-              
-              <TabsContent value="phone">
-                <form onSubmit={handlePhoneRegistration}>
-                  <div className="space-y-4">
-                    <div>
-                      <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
-                        手机号码
-                      </label>
-                      <input 
-                        type="tel" 
-                        id="phone" 
-                        className="w-full p-2 border rounded-md" 
-                        placeholder="请输入手机号码"
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="verificationCode" className="block text-sm font-medium text-gray-700 mb-1">
-                        验证码
-                      </label>
-                      <div className="flex gap-2">
-                        <input 
-                          type="text" 
-                          id="verificationCode" 
-                          className="w-full p-2 border rounded-md" 
-                          placeholder="请输入验证码"
-                        />
-                        <Button variant="outline" type="button">
-                          获取验证码
-                        </Button>
-                      </div>
-                    </div>
-                    <div>
-                      <label htmlFor="phonePassword" className="block text-sm font-medium text-gray-700 mb-1">
-                        设置密码
-                      </label>
-                      <input 
-                        type="password" 
-                        id="phonePassword" 
-                        className="w-full p-2 border rounded-md" 
-                        placeholder="请设置密码"
-                      />
-                    </div>
-                    <div className="flex items-start">
-                      <input type="checkbox" id="phoneAgreeTerms" className="mt-1 mr-2" />
-                      <label htmlFor="phoneAgreeTerms" className="text-sm text-gray-600">
-                        我已阅读并同意<a href="#" className="text-novel-red hover:underline">用户协议</a>和<a href="#" className="text-novel-red hover:underline">隐私政策</a>
-                      </label>
-                    </div>
-                  </div>
-                  <Button 
-                    type="submit" 
-                    className="w-full mt-6 bg-novel-red hover:bg-novel-red/90"
-                  >
-                    <UserPlus size={18} className="mr-2" />
-                    注册账号
-                  </Button>
-                </form>
-              </TabsContent>
+                    <Button 
+                      type="submit" 
+                      className="w-full mt-6 bg-novel-red hover:bg-novel-red/90"
+                    >
+                      <UserPlus size={18} className="mr-2" />
+                      注册账号
+                    </Button>
+                  </form>
+                </TabsContent>
+              </Tabs>
               
               <div className="mt-6 text-center">
                 <p className="text-sm text-gray-600">
@@ -273,7 +273,7 @@ const RegistrationPage = () => {
                   </Link>
                 </p>
               </div>
-            </CardContent>
+            </CardHeader>
           </Card>
         </div>
       </div>
