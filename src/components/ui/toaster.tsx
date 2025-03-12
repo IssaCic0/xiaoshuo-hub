@@ -1,3 +1,4 @@
+
 import { useToast } from "@/hooks/use-toast"
 import {
   Toast,
@@ -31,3 +32,6 @@ export function Toaster() {
     </ToastProvider>
   )
 }
+
+// Re-export the useToast and toast from hooks
+export { useToast, toast } from "@/hooks/use-toast"

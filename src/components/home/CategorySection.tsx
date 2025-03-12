@@ -1,10 +1,9 @@
-
 import { Link } from 'react-router-dom';
 import { Card, CardContent } from "@/components/ui/card";
 import { 
   Sparkles, 
   Swords, 
-  Buildings, 
+  Building, 
   History, 
   Rocket, 
   Heart, 
@@ -31,7 +30,7 @@ const categories = [
   {
     id: "urban",
     name: "都市言情",
-    icon: <Buildings size={28} />,
+    icon: <Building size={28} />,
     color: "bg-pink-100 text-pink-600",
     description: "都市生活，情感纠葛",
   },
