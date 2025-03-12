@@ -11,15 +11,26 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer 
 } from "recharts";
 import { BarChart3, TrendingUp, PieChart as PieChartIcon, Users, BookOpen, MessageSquare, CalendarDays } from "lucide-react";
+import { DatePickerWithRange } from "@/components/ui/date-range-picker";
+import { addDays, format } from "date-fns";
+import { Calendar as CalendarIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 // 模拟数据 - 用户增长
 const userGrowthData = [
-  { date: "2024-01", 注册用户数: 120, 活跃用户数: 95 },
-  { date: "2024-02", 注册用户数: 145, 活跃用户数: 105 },
-  { date: "2024-03", 注册用户数: 175, 活跃用户数: 130 },
-  { date: "2024-04", 注册用户数: 190, 活跃用户数: 145 },
-  { date: "2024-05", 注册用户数: 220, 活跃用户数: 165 },
-  { date: "2024-06", 注册用户数: 250, 活跃用户数: 180 },
+  { date: "2024-01", total: 1200, new: 200, active: 800 },
+  { date: "2024-02", total: 1500, new: 300, active: 1000 },
+  { date: "2024-03", total: 2000, new: 500, active: 1300 },
+  { date: "2024-04", total: 2800, new: 800, active: 1800 },
+  { date: "2024-05", total: 3500, new: 700, active: 2200 },
+  { date: "2024-06", total: 4200, new: 700, active: 2800 }
 ];
 
 // 模拟数据 - 内容增长
@@ -75,178 +86,209 @@ const ratingData = [
   { name: "5星", 数量: 425 },
 ];
 
-// 模拟数据 - 平台关键指标
-const platformMetrics = [
-  { date: "2024-01", DAU: 3200, MAU: 5500, 留存率: 65, 转化率: 7.5 },
-  { date: "2024-02", DAU: 3400, MAU: 6200, 留存率: 68, 转化率: 7.8 },
-  { date: "2024-03", DAU: 3650, MAU: 6800, 留存率: 70, 转化率: 8.0 },
-  { date: "2024-04", DAU: 3800, MAU: 7100, 留存率: 72, 转化率: 8.3 },
-  { date: "2024-05", DAU: 4200, MAU: 7500, 留存率: 74, 转化率: 8.7 },
-  { date: "2024-06", DAU: 4500, MAU: 8000, 留存率: 75, 转化率: 9.0 },
+// 模拟数据 - 阅读数据
+const readingData = [
+  { date: "2024-01", views: 50000, duration: 25000 },
+  { date: "2024-02", views: 65000, duration: 32000 },
+  { date: "2024-03", views: 85000, duration: 42000 },
+  { date: "2024-04", views: 120000, duration: 58000 },
+  { date: "2024-05", views: 150000, duration: 72000 },
+  { date: "2024-06", views: 180000, duration: 85000 }
+];
+
+// 模拟数据 - 小说分类占比
+const categoryData = [
+  { name: "玄幻", value: 35 },
+  { name: "武侠", value: 25 },
+  { name: "都市", value: 20 },
+  { name: "科幻", value: 15 },
+  { name: "其他", value: 5 }
 ];
 
 // 饼图颜色
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#A569BD', '#5DADE2', '#45B39D'];
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 
 const AdminStatisticsPage = () => {
-  const [timeRange, setTimeRange] = useState("6个月");
-  
+  const [dateRange, setDateRange] = useState({
+    from: addDays(new Date(), -30),
+    to: new Date(),
+  });
+
   return (
     <div className="flex min-h-screen bg-gray-100">
       <AdminSidebar />
       <div className="flex-1 p-8">
-        <div className="flex justify-between items-center mb-6">
+        <div className="mb-6">
           <h1 className="text-3xl font-bold">数据统计</h1>
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-500">时间范围：</span>
-            <Select 
-              value={timeRange} 
-              onValueChange={setTimeRange}
-            >
-              <SelectTrigger className="w-32">
-                <SelectValue placeholder="选择时间范围" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="7天">7天</SelectItem>
-                <SelectItem value="30天">30天</SelectItem>
-                <SelectItem value="3个月">3个月</SelectItem>
-                <SelectItem value="6个月">6个月</SelectItem>
-                <SelectItem value="1年">1年</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          <p className="text-gray-500 mt-2">查看网站运营数据和趋势分析</p>
         </div>
 
-        <Tabs defaultValue="growth" className="mb-8">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="growth" className="flex items-center gap-2">
-              <TrendingUp className="h-4 w-4" />
-              <span>增长趋势</span>
-            </TabsTrigger>
-            <TabsTrigger value="content" className="flex items-center gap-2">
-              <BookOpen className="h-4 w-4" />
-              <span>内容分析</span>
-            </TabsTrigger>
-            <TabsTrigger value="users" className="flex items-center gap-2">
-              <Users className="h-4 w-4" />
-              <span>用户分析</span>
-            </TabsTrigger>
-            <TabsTrigger value="platform" className="flex items-center gap-2">
-              <BarChart3 className="h-4 w-4" />
-              <span>平台指标</span>
-            </TabsTrigger>
+        <div className="flex justify-between items-center mb-6">
+          <Select defaultValue="30">
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="选择时间范围" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="7">最近7天</SelectItem>
+              <SelectItem value="30">最近30天</SelectItem>
+              <SelectItem value="90">最近90天</SelectItem>
+              <SelectItem value="365">最近一年</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <DatePickerWithRange date={dateRange} setDate={setDateRange} />
+        </div>
+
+        <div className="grid grid-cols-4 gap-6 mb-6">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">总用户数</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">4,200</div>
+              <p className="text-xs text-muted-foreground">
+                较上月增长 16.7%
+              </p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">总阅读量</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">180,000</div>
+              <p className="text-xs text-muted-foreground">
+                较上月增长 20%
+              </p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">小说总数</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">1,500</div>
+              <p className="text-xs text-muted-foreground">
+                较上月增长 12.5%
+              </p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">日活跃用户</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">2,800</div>
+              <p className="text-xs text-muted-foreground">
+                较上月增长 27.3%
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+
+        <Tabs defaultValue="users" className="space-y-6">
+          <TabsList>
+            <TabsTrigger value="users">用户分析</TabsTrigger>
+            <TabsTrigger value="reading">阅读分析</TabsTrigger>
+            <TabsTrigger value="novels">小说分析</TabsTrigger>
           </TabsList>
-          
-          {/* 增长趋势标签页 */}
-          <TabsContent value="growth">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Users className="h-5 w-5" />
-                    <span>用户增长趋势</span>
-                  </CardTitle>
-                  <CardDescription>显示平台用户数量增长情况</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-80">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <AreaChart data={userGrowthData}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="date" />
-                        <YAxis />
-                        <Tooltip />
-                        <Legend />
-                        <Area 
-                          type="monotone" 
-                          dataKey="注册用户数" 
-                          stackId="1"
-                          stroke="#8884d8" 
-                          fill="#8884d8" 
-                        />
-                        <Area 
-                          type="monotone" 
-                          dataKey="活跃用户数" 
-                          stackId="2"
-                          stroke="#82ca9d" 
-                          fill="#82ca9d" 
-                        />
-                      </AreaChart>
-                    </ResponsiveContainer>
-                  </div>
-                </CardContent>
-              </Card>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <BookOpen className="h-5 w-5" />
-                    <span>内容增长趋势</span>
-                  </CardTitle>
-                  <CardDescription>显示平台小说和章节数量增长情况</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-80">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={contentGrowthData}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="date" />
-                        <YAxis yAxisId="left" />
-                        <YAxis yAxisId="right" orientation="right" />
-                        <Tooltip />
-                        <Legend />
-                        <Line 
-                          yAxisId="left"
-                          type="monotone" 
-                          dataKey="小说数量" 
-                          stroke="#8884d8" 
-                          activeDot={{ r: 8 }}
-                        />
-                        <Line 
-                          yAxisId="right"
-                          type="monotone" 
-                          dataKey="章节数量" 
-                          stroke="#82ca9d" 
-                        />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+          <TabsContent value="users" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>用户增长趋势</CardTitle>
+                <CardDescription>
+                  展示用户总数、新增用户和活跃用户的变化趋势
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[400px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={userGrowthData}>
+                      <defs>
+                        <linearGradient id="total" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8}/>
+                          <stop offset="95%" stopColor="#8884d8" stopOpacity={0}/>
+                        </linearGradient>
+                        <linearGradient id="new" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#82ca9d" stopOpacity={0.8}/>
+                          <stop offset="95%" stopColor="#82ca9d" stopOpacity={0}/>
+                        </linearGradient>
+                        <linearGradient id="active" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#ffc658" stopOpacity={0.8}/>
+                          <stop offset="95%" stopColor="#ffc658" stopOpacity={0}/>
+                        </linearGradient>
+                      </defs>
+                      <XAxis dataKey="date" />
+                      <YAxis />
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <Tooltip />
+                      <Legend />
+                      <Area type="monotone" dataKey="total" stroke="#8884d8" fillOpacity={1} fill="url(#total)" name="总用户数" />
+                      <Area type="monotone" dataKey="new" stroke="#82ca9d" fillOpacity={1} fill="url(#new)" name="新增用户" />
+                      <Area type="monotone" dataKey="active" stroke="#ffc658" fillOpacity={1} fill="url(#active)" name="活跃用户" />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
-          
-          {/* 内容分析标签页 */}
-          <TabsContent value="content">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+          <TabsContent value="reading" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>阅读数据分析</CardTitle>
+                <CardDescription>
+                  展示阅读量和阅读时长的变化趋势
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[400px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={readingData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="date" />
+                      <YAxis yAxisId="left" />
+                      <YAxis yAxisId="right" orientation="right" />
+                      <Tooltip />
+                      <Legend />
+                      <Line yAxisId="left" type="monotone" dataKey="views" stroke="#8884d8" name="阅读量" />
+                      <Line yAxisId="right" type="monotone" dataKey="duration" stroke="#82ca9d" name="阅读时长(分钟)" />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="novels" className="space-y-6">
+            <div className="grid grid-cols-2 gap-6">
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <PieChartIcon className="h-5 w-5" />
-                    <span>各类型小说阅读量分布</span>
-                  </CardTitle>
-                  <CardDescription>显示不同类型小说的阅读量比例</CardDescription>
+                  <CardTitle>小说分类占比</CardTitle>
+                  <CardDescription>
+                    各类型小说数量分布
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="h-80">
+                  <div className="h-[300px]">
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
                         <Pie
-                          data={readingVolumeData}
+                          data={categoryData}
                           cx="50%"
                           cy="50%"
-                          labelLine={true}
-                          label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                          labelLine={false}
+                          label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                           outerRadius={80}
                           fill="#8884d8"
-                          dataKey="阅读量"
+                          dataKey="value"
                         >
-                          {readingVolumeData.map((entry, index) => (
+                          {categoryData.map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                           ))}
                         </Pie>
-                        <Tooltip formatter={(value) => `${value.toLocaleString()} 次`} />
-                        <Legend />
+                        <Tooltip />
                       </PieChart>
                     </ResponsiveContainer>
                   </div>
@@ -255,239 +297,35 @@ const AdminStatisticsPage = () => {
 
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <BarChart3 className="h-5 w-5" />
-                    <span>用户评分分布</span>
-                  </CardTitle>
-                  <CardDescription>显示用户对小说的评分分布情况</CardDescription>
+                  <CardTitle>热门小说排行</CardTitle>
+                  <CardDescription>
+                    按阅读量排序的前10本小说
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="h-80">
+                  <div className="h-[300px]">
                     <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={ratingData}>
+                      <BarChart
+                        layout="vertical"
+                        data={[
+                          { name: "斗破苍穹", views: 15000 },
+                          { name: "武动乾坤", views: 12000 },
+                          { name: "大主宰", views: 10000 },
+                          { name: "完美世界", views: 8000 },
+                          { name: "遮天", views: 7000 }
+                        ]}
+                        margin={{ top: 5, right: 30, left: 50, bottom: 5 }}
+                      >
                         <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="name" />
-                        <YAxis />
+                        <XAxis type="number" />
+                        <YAxis dataKey="name" type="category" />
                         <Tooltip />
-                        <Legend />
-                        <Bar dataKey="数量" fill="#8884d8">
-                          {ratingData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                          ))}
-                        </Bar>
+                        <Bar dataKey="views" fill="#8884d8" name="阅读量" />
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
                 </CardContent>
               </Card>
-
-              <Card className="lg:col-span-2">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <CalendarDays className="h-5 w-5" />
-                    <span>访问时段分布</span>
-                  </CardTitle>
-                  <CardDescription>显示用户访问的时间段分布</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-80">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={visitTimeData}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="time" />
-                        <YAxis />
-                        <Tooltip />
-                        <Legend />
-                        <Bar dataKey="访问量" fill="#8884d8" />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-          
-          {/* 用户分析标签页 */}
-          <TabsContent value="users">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <PieChartIcon className="h-5 w-5" />
-                    <span>用户设备分布</span>
-                  </CardTitle>
-                  <CardDescription>显示用户访问设备类型分布</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-80">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
-                        <Pie
-                          data={deviceData}
-                          cx="50%"
-                          cy="50%"
-                          labelLine={true}
-                          label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                          outerRadius={80}
-                          fill="#8884d8"
-                          dataKey="占比"
-                        >
-                          {deviceData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                          ))}
-                        </Pie>
-                        <Tooltip formatter={(value) => `${value}%`} />
-                        <Legend />
-                      </PieChart>
-                    </ResponsiveContainer>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <MessageSquare className="h-5 w-5" />
-                    <span>评论互动分析</span>
-                  </CardTitle>
-                  <CardDescription>展示用户评论和互动情况趋势</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-80">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <AreaChart data={userGrowthData}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="date" />
-                        <YAxis />
-                        <Tooltip />
-                        <Legend />
-                        <Area 
-                          type="monotone" 
-                          dataKey="注册用户数" 
-                          name="评论数"
-                          stroke="#8884d8" 
-                          fill="#8884d8" 
-                        />
-                        <Area 
-                          type="monotone" 
-                          dataKey="活跃用户数" 
-                          name="互动数"
-                          stroke="#82ca9d" 
-                          fill="#82ca9d" 
-                        />
-                      </AreaChart>
-                    </ResponsiveContainer>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-          
-          {/* 平台指标标签页 */}
-          <TabsContent value="platform">
-            <div className="grid grid-cols-1 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <BarChart3 className="h-5 w-5" />
-                    <span>平台关键指标</span>
-                  </CardTitle>
-                  <CardDescription>显示平台关键业务指标走势</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-96">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={platformMetrics}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="date" />
-                        <YAxis yAxisId="left" />
-                        <YAxis yAxisId="right" orientation="right" />
-                        <Tooltip />
-                        <Legend />
-                        <Line 
-                          yAxisId="left"
-                          type="monotone" 
-                          dataKey="DAU" 
-                          stroke="#8884d8" 
-                          activeDot={{ r: 8 }}
-                        />
-                        <Line 
-                          yAxisId="left"
-                          type="monotone" 
-                          dataKey="MAU" 
-                          stroke="#82ca9d" 
-                        />
-                        <Line 
-                          yAxisId="right"
-                          type="monotone" 
-                          dataKey="留存率" 
-                          stroke="#ffc658" 
-                        />
-                        <Line 
-                          yAxisId="right"
-                          type="monotone" 
-                          dataKey="转化率" 
-                          stroke="#ff8042" 
-                        />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">总用户数</CardTitle>
-                    <Users className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">8,431</div>
-                    <p className="text-xs text-muted-foreground">
-                      <span className="text-green-500">+12.5%</span> 较上月
-                    </p>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">总小说数</CardTitle>
-                    <BookOpen className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">1,024</div>
-                    <p className="text-xs text-muted-foreground">
-                      <span className="text-green-500">+8.3%</span> 较上月
-                    </p>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">总阅读量</CardTitle>
-                    <BarChart3 className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">892,356</div>
-                    <p className="text-xs text-muted-foreground">
-                      <span className="text-green-500">+18.2%</span> 较上月
-                    </p>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">转化率</CardTitle>
-                    <TrendingUp className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">9.0%</div>
-                    <p className="text-xs text-muted-foreground">
-                      <span className="text-green-500">+0.5%</span> 较上月
-                    </p>
-                  </CardContent>
-                </Card>
-              </div>
             </div>
           </TabsContent>
         </Tabs>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo, useCallback, memo } from "react";
 import AdminSidebar from "@/components/admin/AdminSidebar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -39,6 +39,7 @@ import { Badge } from "@/components/ui/badge";
 import { Ban, Eye, MoreHorizontal, Search, Shield, User, UserCog } from "lucide-react";
 import { useToast } from "@/components/ui/toaster";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { cn } from "@/lib/utils";
 
 // 模拟用户数据
 const mockUsers = [
@@ -153,6 +154,259 @@ interface User {
   bookshelfCount: number;
 }
 
+// 提取用户表格行组件
+const UserTableRow = memo(({ 
+  user, 
+  onViewUser, 
+  onResetPassword, 
+  onBanUser, 
+  onChangeRole 
+}: {
+  user: User;
+  onViewUser: (user: User) => void;
+  onResetPassword: (user: User) => void;
+  onBanUser: (user: User) => void;
+  onChangeRole: (user: User, role: string) => void;
+}) => {
+  return (
+    <TableRow>
+      <TableCell>
+        <div className="flex items-center gap-3">
+          <Avatar className="h-8 w-8">
+            <AvatarImage src={user.avatar} alt={user.nickname} />
+            <AvatarFallback>{user.nickname[0]}</AvatarFallback>
+          </Avatar>
+          <div>
+            <div className="font-medium">{user.nickname}</div>
+            <div className="text-xs text-gray-500">@{user.username}</div>
+          </div>
+        </div>
+      </TableCell>
+      <TableCell>
+        <Badge 
+          variant="outline" 
+          className={cn({
+            "bg-blue-100 text-blue-800 border-blue-200": user.role === "管理员",
+            "bg-gold-100 text-gold-800 border-gold-200": user.role === "VIP用户",
+            "bg-gray-100 text-gray-800 border-gray-200": user.role === "普通用户"
+          })}
+        >
+          {user.role}
+        </Badge>
+      </TableCell>
+      <TableCell>
+        <Badge 
+          variant="outline" 
+          className={cn({
+            "bg-green-100 text-green-800 border-green-200": user.status === "正常",
+            "bg-red-100 text-red-800 border-red-200": user.status === "已禁用"
+          })}
+        >
+          {user.status}
+        </Badge>
+      </TableCell>
+      <TableCell>{user.registerDate}</TableCell>
+      <TableCell>{user.lastLoginDate}</TableCell>
+      <TableCell>{user.bookshelfCount}</TableCell>
+      <TableCell className="text-right">
+        <UserActions 
+          user={user}
+          onViewUser={onViewUser}
+          onResetPassword={onResetPassword}
+          onBanUser={onBanUser}
+          onChangeRole={onChangeRole}
+        />
+      </TableCell>
+    </TableRow>
+  );
+});
+
+// 提取用户操作下拉菜单组件
+const UserActions = memo(({ 
+  user, 
+  onViewUser, 
+  onResetPassword, 
+  onBanUser, 
+  onChangeRole 
+}: {
+  user: User;
+  onViewUser: (user: User) => void;
+  onResetPassword: (user: User) => void;
+  onBanUser: (user: User) => void;
+  onChangeRole: (user: User, role: string) => void;
+}) => {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon">
+          <MoreHorizontal className="h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuLabel>用户操作</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={() => onViewUser(user)}>
+          <Eye className="mr-2 h-4 w-4" />
+          查看详情
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => onResetPassword(user)}>
+          <Shield className="mr-2 h-4 w-4" />
+          重置密码
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={() => onBanUser(user)}>
+          <Ban className="mr-2 h-4 w-4" />
+          {user.status === "正常" ? "禁用用户" : "解除禁用"}
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem>
+          <UserCog className="mr-2 h-4 w-4" />
+          更改角色
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => onChangeRole(user, "普通用户")}>
+          <div className="ml-6">普通用户</div>
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => onChangeRole(user, "VIP用户")}>
+          <div className="ml-6">VIP用户</div>
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => onChangeRole(user, "管理员")}>
+          <div className="ml-6">管理员</div>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+});
+
+// 提取搜索和过滤组件
+const SearchAndFilter = memo(({
+  searchTerm,
+  selectedRole,
+  selectedStatus,
+  onSearchChange,
+  onRoleChange,
+  onStatusChange
+}: {
+  searchTerm: string;
+  selectedRole: string;
+  selectedStatus: string;
+  onSearchChange: (value: string) => void;
+  onRoleChange: (value: string) => void;
+  onStatusChange: (value: string) => void;
+}) => {
+  return (
+    <Card className="mb-6">
+      <CardContent className="pt-6">
+        <div className="flex flex-col lg:flex-row gap-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-3 h-4 w-4 text-gray-500" />
+            <Input
+              placeholder="搜索用户名、昵称或邮箱"
+              className="pl-10"
+              value={searchTerm}
+              onChange={(e) => onSearchChange(e.target.value)}
+            />
+          </div>
+          <div className="flex gap-4">
+            <Select 
+              value={selectedRole} 
+              onValueChange={onRoleChange}
+            >
+              <SelectTrigger className="w-32">
+                <SelectValue placeholder="选择角色" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="所有角色">所有角色</SelectItem>
+                <SelectItem value="普通用户">普通用户</SelectItem>
+                <SelectItem value="VIP用户">VIP用户</SelectItem>
+                <SelectItem value="管理员">管理员</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select 
+              value={selectedStatus} 
+              onValueChange={onStatusChange}
+            >
+              <SelectTrigger className="w-32">
+                <SelectValue placeholder="选择状态" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="所有状态">所有状态</SelectItem>
+                <SelectItem value="正常">正常</SelectItem>
+                <SelectItem value="已禁用">已禁用</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+});
+
+// 提取用户列表组件
+const UserList = memo(({
+  users,
+  onViewUser,
+  onResetPassword,
+  onBanUser,
+  onChangeRole
+}: {
+  users: User[];
+  onViewUser: (user: User) => void;
+  onResetPassword: (user: User) => void;
+  onBanUser: (user: User) => void;
+  onChangeRole: (user: User, role: string) => void;
+}) => {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center">
+          <User className="mr-2 h-5 w-5" />
+          用户列表
+        </CardTitle>
+        <CardDescription>
+          共 {users.length} 位用户
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="rounded-md border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>用户信息</TableHead>
+                <TableHead>角色</TableHead>
+                <TableHead>状态</TableHead>
+                <TableHead>注册日期</TableHead>
+                <TableHead>最后登录</TableHead>
+                <TableHead>书架数</TableHead>
+                <TableHead className="text-right">操作</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {users.length > 0 ? (
+                users.map((user) => (
+                  <UserTableRow
+                    key={user.id}
+                    user={user}
+                    onViewUser={onViewUser}
+                    onResetPassword={onResetPassword}
+                    onBanUser={onBanUser}
+                    onChangeRole={onChangeRole}
+                  />
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center py-4">
+                    没有找到匹配的用户
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      </CardContent>
+    </Card>
+  );
+});
+
 const AdminUsersPage = () => {
   const { toast } = useToast();
   const [users, setUsers] = useState<User[]>(mockUsers);
@@ -168,31 +422,34 @@ const AdminUsersPage = () => {
     action: () => void;
   } | null>(null);
 
-  // 过滤用户
-  const filteredUsers = users.filter(user => {
-    const matchesSearch = user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  // 使用 useMemo 优化过滤逻辑
+  const filteredUsers = useMemo(() => {
+    return users.filter(user => {
+      const matchesSearch = user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           user.nickname.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           user.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesRole = selectedRole === "所有角色" || user.role === selectedRole;
-    const matchesStatus = selectedStatus === "所有状态" || user.status === selectedStatus;
-    return matchesSearch && matchesRole && matchesStatus;
-  });
+      const matchesRole = selectedRole === "所有角色" || user.role === selectedRole;
+      const matchesStatus = selectedStatus === "所有状态" || user.status === selectedStatus;
+      return matchesSearch && matchesRole && matchesStatus;
+    });
+  }, [users, searchTerm, selectedRole, selectedStatus]);
 
-  // 禁用用户
-  const handleBanUser = (user: User) => {
+  // 使用 useCallback 优化事件处理函数
+  const handleBanUser = useCallback((user: User) => {
     setConfirmAction({
       title: user.status === "正常" ? "禁用用户" : "解除禁用",
       description: user.status === "正常" 
         ? `确定要禁用用户"${user.nickname}"吗？禁用后该用户将无法登录系统。` 
         : `确定要解除用户"${user.nickname}"的禁用状态吗？`,
       action: () => {
-        const updatedUsers = users.map(u => 
-          u.id === user.id 
-            ? { ...u, status: u.status === "正常" ? "已禁用" : "正常" } 
-            : u
+        setUsers(prevUsers => 
+          prevUsers.map(u => 
+            u.id === user.id 
+              ? { ...u, status: u.status === "正常" ? "已禁用" : "正常" } 
+              : u
+          )
         );
         
-        setUsers(updatedUsers);
         setIsConfirmDialogOpen(false);
         
         toast({
@@ -205,21 +462,21 @@ const AdminUsersPage = () => {
     });
     
     setIsConfirmDialogOpen(true);
-  };
+  }, [toast]);
 
-  // 更改用户角色
-  const handleChangeRole = (user: User, newRole: string) => {
+  const handleChangeRole = useCallback((user: User, newRole: string) => {
     if (user.role === newRole) return;
 
     setConfirmAction({
       title: "更改用户角色",
       description: `确定要将"${user.nickname}"的角色从"${user.role}"更改为"${newRole}"吗？`,
       action: () => {
-        const updatedUsers = users.map(u => 
-          u.id === user.id ? { ...u, role: newRole } : u
+        setUsers(prevUsers => 
+          prevUsers.map(u => 
+            u.id === user.id ? { ...u, role: newRole } : u
+          )
         );
         
-        setUsers(updatedUsers);
         setIsConfirmDialogOpen(false);
         
         toast({
@@ -230,16 +487,14 @@ const AdminUsersPage = () => {
     });
     
     setIsConfirmDialogOpen(true);
-  };
+  }, [toast]);
 
-  // 查看用户详情
-  const handleViewUser = (user: User) => {
+  const handleViewUser = useCallback((user: User) => {
     setViewingUser(user);
     setIsViewDialogOpen(true);
-  };
+  }, []);
 
-  // 重置用户密码
-  const handleResetPassword = (user: User) => {
+  const handleResetPassword = useCallback((user: User) => {
     setConfirmAction({
       title: "重置密码",
       description: `确定要重置"${user.nickname}"的密码吗？系统将生成一个随机密码并发送到用户邮箱。`,
@@ -248,13 +503,26 @@ const AdminUsersPage = () => {
         
         toast({
           title: "密码已重置",
-          description: `用户"${user.nickname}"的密码已重置，新密码已发送到用户邮箱。`
+          description: `新密码已发送至用户邮箱"${user.email}"。`
         });
       }
     });
     
     setIsConfirmDialogOpen(true);
-  };
+  }, [toast]);
+
+  // 优化搜索和过滤的回调函数
+  const handleSearchChange = useCallback((value: string) => {
+    setSearchTerm(value);
+  }, []);
+
+  const handleRoleChange = useCallback((value: string) => {
+    setSelectedRole(value);
+  }, []);
+
+  const handleStatusChange = useCallback((value: string) => {
+    setSelectedStatus(value);
+  }, []);
 
   return (
     <div className="flex min-h-screen bg-gray-100">
@@ -264,173 +532,22 @@ const AdminUsersPage = () => {
           <h1 className="text-3xl font-bold">用户管理</h1>
         </div>
 
-        <Card className="mb-6">
-          <CardContent className="pt-6">
-            <div className="flex flex-col lg:flex-row gap-4">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-3 h-4 w-4 text-gray-500" />
-                <Input
-                  placeholder="搜索用户名、昵称或邮箱"
-                  className="pl-10"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
-              <div className="flex gap-4">
-                <Select 
-                  value={selectedRole} 
-                  onValueChange={setSelectedRole}
-                >
-                  <SelectTrigger className="w-32">
-                    <SelectValue placeholder="选择角色" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="所有角色">所有角色</SelectItem>
-                    <SelectItem value="普通用户">普通用户</SelectItem>
-                    <SelectItem value="VIP用户">VIP用户</SelectItem>
-                    <SelectItem value="管理员">管理员</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Select 
-                  value={selectedStatus} 
-                  onValueChange={setSelectedStatus}
-                >
-                  <SelectTrigger className="w-32">
-                    <SelectValue placeholder="选择状态" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="所有状态">所有状态</SelectItem>
-                    <SelectItem value="正常">正常</SelectItem>
-                    <SelectItem value="已禁用">已禁用</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <SearchAndFilter
+          searchTerm={searchTerm}
+          selectedRole={selectedRole}
+          selectedStatus={selectedStatus}
+          onSearchChange={handleSearchChange}
+          onRoleChange={handleRoleChange}
+          onStatusChange={handleStatusChange}
+        />
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <User className="mr-2 h-5 w-5" />
-              用户列表
-            </CardTitle>
-            <CardDescription>
-              共 {filteredUsers.length} 位用户
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="rounded-md border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>用户信息</TableHead>
-                    <TableHead>角色</TableHead>
-                    <TableHead>状态</TableHead>
-                    <TableHead>注册日期</TableHead>
-                    <TableHead>最后登录</TableHead>
-                    <TableHead>书架数</TableHead>
-                    <TableHead className="text-right">操作</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredUsers.length > 0 ? (
-                    filteredUsers.map((user) => (
-                      <TableRow key={user.id}>
-                        <TableCell>
-                          <div className="flex items-center gap-3">
-                            <Avatar className="h-8 w-8">
-                              <AvatarImage src={user.avatar} alt={user.nickname} />
-                              <AvatarFallback>{user.nickname[0]}</AvatarFallback>
-                            </Avatar>
-                            <div>
-                              <div className="font-medium">{user.nickname}</div>
-                              <div className="text-xs text-gray-500">@{user.username}</div>
-                            </div>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <Badge 
-                            variant="outline" 
-                            className={`${
-                              user.role === "管理员" 
-                                ? "bg-blue-100 text-blue-800 border-blue-200" 
-                                : user.role === "VIP用户" 
-                                ? "bg-gold-100 text-gold-800 border-gold-200" 
-                                : "bg-gray-100 text-gray-800 border-gray-200"
-                            }`}
-                          >
-                            {user.role}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <Badge 
-                            variant="outline" 
-                            className={user.status === "正常" 
-                              ? "bg-green-100 text-green-800 border-green-200" 
-                              : "bg-red-100 text-red-800 border-red-200"
-                            }
-                          >
-                            {user.status}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>{user.registerDate}</TableCell>
-                        <TableCell>{user.lastLoginDate}</TableCell>
-                        <TableCell>{user.bookshelfCount}</TableCell>
-                        <TableCell className="text-right">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon">
-                                <MoreHorizontal className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuLabel>用户操作</DropdownMenuLabel>
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem onClick={() => handleViewUser(user)}>
-                                <Eye className="mr-2 h-4 w-4" />
-                                查看详情
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleResetPassword(user)}>
-                                <Shield className="mr-2 h-4 w-4" />
-                                重置密码
-                              </DropdownMenuItem>
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem onClick={() => handleBanUser(user)}>
-                                <Ban className="mr-2 h-4 w-4" />
-                                {user.status === "正常" ? "禁用用户" : "解除禁用"}
-                              </DropdownMenuItem>
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem>
-                                <UserCog className="mr-2 h-4 w-4" />
-                                更改角色
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleChangeRole(user, "普通用户")}>
-                                <div className="ml-6">普通用户</div>
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleChangeRole(user, "VIP用户")}>
-                                <div className="ml-6">VIP用户</div>
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleChangeRole(user, "管理员")}>
-                                <div className="ml-6">管理员</div>
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={7} className="text-center py-4">
-                        没有找到匹配的用户
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </div>
-          </CardContent>
-        </Card>
+        <UserList
+          users={filteredUsers}
+          onViewUser={handleViewUser}
+          onResetPassword={handleResetPassword}
+          onBanUser={handleBanUser}
+          onChangeRole={handleChangeRole}
+        />
 
         {/* 用户详情对话框 */}
         <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>

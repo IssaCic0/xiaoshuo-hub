@@ -1,69 +1,85 @@
-# Welcome to your Lovable project
+# 小说阅读系统 / Novel Reading System
 
-## Project info
+## 项目介绍 / Project Introduction
 
-**URL**: https://lovable.dev/projects/915a4bf4-eaf6-4881-b5f1-a09ff2c0bfdd
+这是一个现代化的小说阅读系统，提供小说阅读、收藏、评论等功能，并包含完整的后台管理系统。
 
-## How can I edit this code?
+This is a modern novel reading system that provides features such as novel reading, bookmarking, commenting, and includes a complete admin management system.
 
-There are several ways of editing your application.
+## 技术栈 / Tech Stack
 
-**Use Lovable**
+- 🚀 [Vite](https://vitejs.dev/) - 下一代前端开发工具 / Next Generation Frontend Tooling
+- ⚛️ [React](https://reactjs.org/) - 用户界面构建库 / A JavaScript library for building user interfaces
+- 📘 [TypeScript](https://www.typescriptlang.org/) - 具有类型系统的 JavaScript / JavaScript with syntax for types
+- 🎨 [Tailwind CSS](https://tailwindcss.com/) - 实用优先的 CSS 框架 / A utility-first CSS framework
+- 🎯 [shadcn/ui](https://ui.shadcn.com/) - 精美的 UI 组件库 / Beautiful and accessible UI components
+- 📊 [Recharts](https://recharts.org/) - 数据可视化库 / A composable charting library
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/915a4bf4-eaf6-4881-b5f1-a09ff2c0bfdd) and start prompting.
+## 功能特性 / Features
 
-Changes made via Lovable will be committed automatically to this repo.
+### 用户端 / User Side
+- 📚 小说浏览和阅读 / Novel browsing and reading
+- ⭐ 收藏书架管理 / Bookshelf management
+- 💬 评论互动系统 / Comment interaction system
+- 👤 用户中心功能 / User center functionality
 
-**Use your preferred IDE**
+### 管理端 / Admin Side
+- 📊 数据统计分析 / Data statistics and analysis
+- 👥 用户管理系统 / User management system
+- 📖 小说内容管理 / Novel content management
+- 🏷️ 分类标签管理 / Category and tag management
+- ⚙️ 系统设置管理 / System settings management
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## 安装和使用 / Installation and Usage
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+```bash
+# 克隆项目 / Clone the repository
+git clone <repository-url>
 
-Follow these steps:
+# 进入项目目录 / Enter the project directory
+cd xiaoshuo-hub
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+# 安装依赖 / Install dependencies
+npm install
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# 启动开发服务器 / Start the development server
 npm run dev
+
+# 构建生产版本 / Build for production
+npm run build
 ```
 
-**Edit a file directly in GitHub**
+## 环境要求 / Requirements
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+- Node.js 16.0 或更高版本 / Node.js 16.0 or higher
+- npm 7.0 或更高版本 / npm 7.0 or higher
 
-**Use GitHub Codespaces**
+## 浏览器支持 / Browser Support
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+- 现代浏览器（Chrome、Firefox、Safari、Edge） / Modern browsers (Chrome, Firefox, Safari, Edge)
+- 不支持 IE / IE not supported
 
-## What technologies are used for this project?
+## 项目结构 / Project Structure
 
-This project is built with .
+```
+xiaoshuo-hub/
+├── src/                    # 源代码 / Source code
+│   ├── components/         # 组件 / Components
+│   ├── pages/             # 页面 / Pages
+│   ├── hooks/             # 自定义钩子 / Custom hooks
+│   ├── lib/               # 工具函数 / Utility functions
+│   ├── styles/            # 样式文件 / Style files
+│   └── types/             # 类型定义 / Type definitions
+├── public/                # 静态资源 / Static assets
+└── ...
+```
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## 开发团队 / Development Team
 
-## How can I deploy this project?
+- 前端开发 / Frontend Development
+- UI/UX 设计 / UI/UX Design
+- 项目管理 / Project Management
 
-Simply open [Lovable](https://lovable.dev/projects/915a4bf4-eaf6-4881-b5f1-a09ff2c0bfdd) and click on Share -> Publish.
+## 许可证 / License
 
-## I want to use a custom domain - is that possible?
-
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+[MIT License](LICENSE)

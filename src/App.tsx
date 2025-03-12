@@ -19,6 +19,10 @@ import AdminUsersPage from "./pages/AdminUsersPage";
 import AdminCommentsPage from "./pages/AdminCommentsPage";
 import UserDashboardPage from "./pages/UserDashboardPage";
 import NovelReadingPage from "./pages/NovelReadingPage";
+import AdminPermissionsPage from "./pages/AdminPermissionsPage";
+import AdminSettingsPage from "./pages/AdminSettingsPage";
+import AdminStatisticsPage from "./pages/AdminStatisticsPage";
+import AdminReportsPage from "./pages/AdminReportsPage";
 
 const queryClient = new QueryClient();
 
@@ -45,6 +49,10 @@ const App = () => (
           <Route path="/admin/categories" element={<AdminCategoriesPage />} />
           <Route path="/admin/users" element={<AdminUsersPage />} />
           <Route path="/admin/comments" element={<AdminCommentsPage />} />
+          <Route path="/admin/permissions" element={<AdminPermissionsPage />} />
+          <Route path="/admin/settings" element={<AdminSettingsPage />} />
+          <Route path="/admin/statistics" element={<AdminStatisticsPage />} />
+          <Route path="/admin/reports" element={<AdminReportsPage />} />
           
           <Route path="/user/dashboard" element={<UserDashboardPage />} />
           <Route path="/novel/:novelId" element={<NovelReadingPage />} />
