@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import MainLayout from "@/components/layout/MainLayout";
@@ -132,6 +133,7 @@ const BookshelfPage = () => {
   const { toast } = useToast();
 
   const handleContinueReading = (book: typeof bookshelfItems[0]) => {
+    // Now we'll use the toast to inform the user, but the link will handle navigation
     toast({
       title: "继续阅读",
       description: `开始阅读《${book.title}》: ${book.lastRead}`,
@@ -208,14 +210,16 @@ const BookshelfPage = () => {
                             {book.lastReadTime}
                           </p>
                           <div className="flex gap-2">
-                            <Button 
-                              variant="default" 
-                              size="sm" 
-                              className="bg-novel-red hover:bg-novel-red/90"
-                              onClick={() => handleContinueReading(book)}
-                            >
-                              继续阅读
-                            </Button>
+                            <Link to={`/novel/${book.id}/chapter/${book.progress}`}>
+                              <Button 
+                                variant="default" 
+                                size="sm" 
+                                className="bg-novel-red hover:bg-novel-red/90"
+                                onClick={() => handleContinueReading(book)}
+                              >
+                                继续阅读
+                              </Button>
+                            </Link>
                             <Button 
                               variant="outline" 
                               size="sm"
@@ -267,7 +271,7 @@ const BookshelfPage = () => {
                           <p className="text-gray-500 text-sm mb-2">
                             {book.author}
                           </p>
-                          <p className="text-sm mb-2 line-clamp-2">
+                          <p className="text-sm mb-2 line-clamp-2 text-gray-700">
                             {book.description}
                           </p>
                           <div className="flex gap-1 mb-3">
@@ -281,13 +285,15 @@ const BookshelfPage = () => {
                             收藏于: {book.addedTime}
                           </p>
                           <div className="flex gap-2">
-                            <Button 
-                              variant="default" 
-                              size="sm" 
-                              className="bg-novel-red hover:bg-novel-red/90"
-                            >
-                              开始阅读
-                            </Button>
+                            <Link to={`/novel/${book.id}/chapter/1`}>
+                              <Button 
+                                variant="default" 
+                                size="sm" 
+                                className="bg-novel-red hover:bg-novel-red/90"
+                              >
+                                开始阅读
+                              </Button>
+                            </Link>
                             <Button 
                               variant="outline" 
                               size="sm"
@@ -323,7 +329,7 @@ const BookshelfPage = () => {
                   <ul className="divide-y">
                     {historyItems.map((item) => (
                       <li key={item.id} className="py-4 first:pt-0 last:pb-0">
-                        <Link to={`/novel/${item.id}`} className="flex items-center gap-4 group">
+                        <Link to={`/novel/${item.id}/chapter/1`} className="flex items-center gap-4 group">
                           <div className="w-14 h-20 flex-shrink-0 overflow-hidden rounded-md">
                             <img 
                               src={item.cover} 
@@ -351,7 +357,11 @@ const BookshelfPage = () => {
                               variant="ghost" 
                               size="sm" 
                               className="text-novel-red hover:bg-red-50"
-                              onClick={() => handleRemoveBook(item.id)}
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                handleRemoveBook(item.id);
+                              }}
                             >
                               删除
                             </Button>

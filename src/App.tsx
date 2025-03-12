@@ -15,6 +15,7 @@ import RankingPage from "./pages/RankingPage";
 import AdminLoginPage from "./pages/AdminLoginPage";
 import AdminDashboardPage from "./pages/AdminDashboardPage";
 import UserDashboardPage from "./pages/UserDashboardPage";
+import NovelReadingPage from "./pages/NovelReadingPage";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +37,8 @@ const App = () => (
           <Route path="/admin/login" element={<AdminLoginPage />} />
           <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
           <Route path="/user/dashboard" element={<UserDashboardPage />} />
+          <Route path="/novel/:novelId" element={<NovelReadingPage />} />
+          <Route path="/novel/:novelId/chapter/:chapterId" element={<NovelReadingPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
