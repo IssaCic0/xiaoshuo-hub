@@ -1,3 +1,4 @@
+
 import { Link } from 'react-router-dom';
 import { Card, CardContent } from "@/components/ui/card";
 import { 
@@ -12,7 +13,7 @@ import {
   Baby
 } from "lucide-react";
 
-const categories = [
+export const categories = [
   {
     id: "fantasy",
     name: "玄幻奇幻",
