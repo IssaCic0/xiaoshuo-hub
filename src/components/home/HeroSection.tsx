@@ -1,4 +1,3 @@
-
 import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { BookOpen } from "lucide-react";
@@ -23,7 +22,7 @@ const HeroSection = () => {
                   开始阅读
                 </Link>
               </Button>
-              <Button className="chinese-btn-secondary text-lg" variant="outline" asChild>
+              <Button className="bg-white text-novel-gold border-novel-gold hover:bg-novel-gold hover:text-white text-lg" variant="outline" asChild>
                 <Link to="/login">注册账户</Link>
               </Button>
             </div>
@@ -45,7 +44,7 @@ const HeroSection = () => {
                     </p>
                   </div>
                 </div>
-                <Button className="w-full" variant="outline" asChild>
+                <Button className="w-full bg-white text-novel-deepBlue border-novel-deepBlue hover:bg-novel-deepBlue hover:text-white" variant="outline" asChild>
                   <Link to="/novel/1">立即阅读</Link>
                 </Button>
               </div>
